@@ -1,4 +1,6 @@
 from data_classes import *
+import textblob
+
 
 class TicketAnalysisAgent:
     async def analyze_ticket(self, ticket_content: str, customer_info: Optional[dict] = None) -> TicketAnalysis:
@@ -104,6 +106,46 @@ class TicketAnalysisAgent:
 
         if not key_points:
             key_points = sentences[:3]  # store first 3 sentences if no category defined 
+
+        # Assign the correct support team
+        support_expertise = {
+            TicketCategory.ACCESS: ["System Administrator" , "Access Manager"],
+            TicketCategory.BILLING: ["Billing accountant", "Account Manager" , "Financial Manager"],
+            TicketCategory.TECHNICAL: ["Technical Support Engineer" , "Customer Support"],
+            TicketCategory.FEATURE: ["Product Manager", "Developer" , "Project Manager"]
+        }
+        # determine support and if no category send to general support 
+        required_expertise = support_expertise.get(category, ["General Support"])
+        
+        # Default sentiment analysis score (higher if urgent and vice versa)
+        sentiment = 0.5
+        if urgency_detection:
+            sentiment = 0.8
+        else:
+            sentiment = 0.3
+        
+        # Map category to suggested response type
+        mapping_response = {
+            TicketCategory.ACCESS: "access_issue",
+            TicketCategory.BILLING: "billing_query",
+            TicketCategory.TECHNICAL: "technical_issue",
+            TicketCategory.FEATURE: "feature_request"
+        }
+        #incase no category so general response
+        suggested_response_type = mapping_response.get(category, "general_response")
+
+        #returning all required values 
+        return TicketAnalysis(
+
+            category=category,
+            priority=priority,
+            key_points=key_points,
+            required_expertise=required_expertise,
+            sentiment=sentiment,
+            urgency_indicators=urgency_detection,
+            business_impact=business_impact,
+            suggested_response_type=suggested_response_type
+        )
 
         
 
