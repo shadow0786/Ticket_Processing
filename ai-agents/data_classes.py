@@ -24,3 +24,10 @@ class TicketAnalysis:
     urgency_indicators: List[str]
     business_impact: str
     suggested_response_type: str
+
+@dataclass
+class ResponseSuggestion:
+    response_text: str
+    confidence_score: float
+    requires_approval: bool
+    suggested_actions: List[str]
