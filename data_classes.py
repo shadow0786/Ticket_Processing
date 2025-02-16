@@ -24,6 +24,7 @@ class TicketAnalysis:
     urgency_indicators: List[str]
     business_impact: str
     suggested_response_type: str
+    follow_up_prediction: Optional[str] = None  # NEW FIELD
 
 @dataclass
 class ResponseSuggestion:

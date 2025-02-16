@@ -1,6 +1,6 @@
 from data_classes import *
-from ticket_analysis_agent import TicketAnalysisAgent
-from response_generation_agent import ResponseAgent
+from .ticket_analysis_agent import TicketAnalysisAgent
+from .response_generation_agent import ResponseAgent
 
 
 

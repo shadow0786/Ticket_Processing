@@ -1,9 +1,9 @@
 import unittest
 from ai_agents.ticket_analysis_agent import TicketAnalysisAgent
-from ai_agents.data_classes import *
+from data_classes import *
 from ai_agents.response_generation_agent import ResponseAgent
 from ai_agents.agent_orchestration import TicketProcessor
-from templates import *
+from .templates import *
 
 
 ## test class to initialise and conduct the test
@@ -49,7 +49,7 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
 
         #checking if we received the expected response 
         response = await response_agent.generate_response(analysis, RESPONSE_TEMPLATES, context)
-        self.assertIn("John Doe", response.response_text)
+        self.assertIn("Yazan A", response.response_text)
         self.assertIn("admin dashboard", response.response_text)
     
     async def test_error_handling(self):

@@ -1,5 +1,5 @@
 from data_classes import *
-import textblob
+from textblob import TextBlob
 
 
 class TicketAnalysisAgent:
@@ -117,12 +117,11 @@ class TicketAnalysisAgent:
         # determine support and if no category send to general support 
         required_expertise = support_expertise.get(category, ["General Support"])
         
-        # Default sentiment analysis score (higher if urgent and vice versa)
-        sentiment = 0.5
-        if urgency_detection:
-            sentiment = 0.8
-        else:
-            sentiment = 0.3
+        ## Advanced extra sentiment analysis using textblob package to determine positive or negative sentiment of ticket data 
+        text_analysis = TextBlob(ticket_content)
+        polarity = text_analysis.sentiment.polarity  # Value between -1 (negative) and 1 (positive)
+        sentiment = (polarity + 1) / 2  # Convert to scale 0 (very negative) to 1 (very positive)
+
         
         # Map category to suggested response type
         mapping_response = {
@@ -134,6 +133,23 @@ class TicketAnalysisAgent:
         #incase no category so general response
         suggested_response_type = mapping_response.get(category, "general_response")
 
+        # Extra feature - Follow-up Prediction based on category and sentiment
+        follow_up_prediction = ""
+        if category == TicketCategory.BILLING:
+            follow_up_prediction = "The client may ask for more information about invoices or payment methods."
+        elif category == TicketCategory.ACCESS:
+            follow_up_prediction = "The customer might request additional troubleshooting steps or more privileged access."
+        elif category == TicketCategory.TECHNICAL:
+            follow_up_prediction = "The customer might ask further technical support ."
+        elif category == TicketCategory.FEATURE:
+            follow_up_prediction = "The customer might inquire about the product roadmap or feature release timeline."
+        if sentiment < 0.5:
+            follow_up_prediction += "The customer is frustrated as thier issue does not seem to have been resolved and needs to be escalated to higher authorities."
+        else:
+            follow_up_prediction += "The customer is likely giving some constructive feedback or reviews/suggestion about some service"
+
+        
+
         #returning all required values 
         return TicketAnalysis(
 
@@ -144,7 +160,8 @@ class TicketAnalysisAgent:
             sentiment=sentiment,
             urgency_indicators=urgency_detection,
             business_impact=business_impact,
-            suggested_response_type=suggested_response_type
+            suggested_response_type=suggested_response_type ,
+            follow_up_prediction=follow_up_prediction
         )
 
         
