@@ -31,3 +31,9 @@ class ResponseSuggestion:
     confidence_score: float
     requires_approval: bool
     suggested_actions: List[str]
+
+@dataclass
+class TicketResolution:
+    ticket_id: str
+    analysis: TicketAnalysis
+    response: ResponseSuggestion
