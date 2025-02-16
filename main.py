@@ -3,11 +3,25 @@ from data_classes import *
 from ai_agents.agent_orchestration import TicketProcessor
 from tests.templates import *
 import asyncio
+from tests import test_agent
 
 ## run main class to run everything
 if __name__ == "__main__":
-    # Run unit tests
-    unittest.main(exit=False)
+    
+    print("\nRunning Unit Tests...\n")
+    
+    # Discover and run tests from all test files in the 'tests' folder
+    test_loader = unittest.defaultTestLoader
+    test_suite = test_loader.discover('tests')  # Ensure tests folder exists
+    test_runner = unittest.TextTestRunner()
+    test_results = test_runner.run(test_suite)
+
+    # If tests fail, prevent ticket processing from running
+    if not test_results.wasSuccessful():
+        print("\n❌ Tests failed! Fix the errors before processing tickets.")
+    else:
+        print("\n✅ All tests passed! Proceeding with ticket processing...\n")
+
     
     # Optionally process and print sample ticket resolutions. This will show output , help in debugging and give us idea of our code accuracy.
     async def process_sample_tickets():

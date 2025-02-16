@@ -1,5 +1,9 @@
 from data_classes import *
-from textblob import TextBlob
+from nltk.sentiment import SentimentIntensityAnalyzer
+import nltk
+# Ensure VADER lexicon is downloaded (run this once)
+nltk.download('vader_lexicon')
+from collections import defaultdict
 
 
 class TicketAnalysisAgent:
@@ -10,7 +14,7 @@ class TicketAnalysisAgent:
         content_lowercase = ticket_content.lower()
 
         # Define urgency keywords. I have added some extra keywords from those mentioned in the document ! 
-        urgency_keywords = ["asap", "urgent", "emergency" , "immediately", "crashed",  "system down" ,"money lost" , "data lost"]
+        urgency_keywords = ["asap", "urgent", "emergency" , "immediately", "crash",  "system down" ,"money lost" , "data lost"]
 
         # Check if any urgency keywords are present in the ticket content.
         urgency_detection = []
@@ -26,25 +30,41 @@ class TicketAnalysisAgent:
         feature = ["feature" , "request" , "function" , "characteristic"]
         technical = ["crash" , "system" , "failed" , "technical error" , "not working" , "server" , "down" , "stuck"]
 
-    # If the ticket mentions billing-related terms, categorize it as BILLING.
-        if any(word in content_lowercase for word in billing):
-            category = TicketCategory.BILLING
+        category_keywords = {
+        TicketCategory.BILLING: billing,
+        TicketCategory.ACCESS: access,
+        TicketCategory.FEATURE: feature,
+        TicketCategory.TECHNICAL: technical,
+    }
+    # Algorithm to assign categories -
+    # first count the occurrences of category keywords and then assign the category based on the highest count. 
+    # In case of a tie, it selects the category whose word appears first.
 
-        # If the ticket is about access issues or login problems, categorize it as ACCESS.
-        elif any(word in content_lowercase for word in access):
-            category = TicketCategory.ACCESS
+    # Count occurrences of each category
+        category_counts = defaultdict(int)
+        first_occurrence = {}
 
-        # If the ticket is about feature requests, categorize it as FEATURE.
-        elif any(word in content_lowercase for word in feature):
-            category = TicketCategory.FEATURE
+        for category, keywords in category_keywords.items():
+            for word in keywords: # iterate over words from each category
+                count = content_lowercase.count(word)  # Count occurrences
+                if count > 0:
+                    category_counts[category] += count
+                    index = content_lowercase.find(word) # store index of word in content
+                    if category not in first_occurrence or index < first_occurrence[category]:
+                        first_occurrence[category] = index  # Track first occurrence index
 
-        # If the ticket mentions errors, crashes, or system issues, categorize it as TECHNICAL.
-        elif any(word in content_lowercase for word in technical):
-            category = TicketCategory.TECHNICAL
+        # Get the category with max occurrences
+        if category_counts:
+            max_count = max(category_counts.values())  # Get highest count
 
-        # If none of the above conditions are met, default to TECHNICAL.
+            # Filter categories that have the max count
+            equal_categories = [cat for cat, count in category_counts.items() if count == max_count]
+
+            # incase of tie choose the category whose word appears first
+            category = min(equal_categories, key=lambda cat: first_occurrence[cat])
         else:
-            category = TicketCategory.TECHNICAL  # Default category
+            category = TicketCategory.TECHNICAL  # Default category if no keywords found
+
 
         # Determine priority based on urgency and customer role. Keep default Low Priority
         priority = Priority.LOW
@@ -117,16 +137,18 @@ class TicketAnalysisAgent:
         # determine support and if no category send to general support 
         required_expertise = support_expertise.get(category, ["General Support"])
         
-        ## Advanced extra sentiment analysis using textblob package to determine positive or negative sentiment of ticket data 
-        text_analysis = TextBlob(ticket_content)
-        polarity = text_analysis.sentiment.polarity  # Value between -1 (negative) and 1 (positive)
-        sentiment = (polarity + 1) / 2  # Convert to scale 0 (very negative) to 1 (very positive)
-
+        ## Advanced extra sentiment analysis using vader package to determine positive or negative sentiment of ticket data 
+        # Initialize VADER SentimentIntensityAnalyzer
+        sia = SentimentIntensityAnalyzer()
+        
+        # Get sentiment scores
+        sentiment_scores = sia.polarity_scores(ticket_content)
+        sentiment = (sentiment_scores["compound"] + 1) / 2  # Normalize to scale 0 to 1
         
         # Map category to suggested response type
         mapping_response = {
             TicketCategory.ACCESS: "access_issue",
-            TicketCategory.BILLING: "billing_query",
+            TicketCategory.BILLING: "billing_inquiry",
             TicketCategory.TECHNICAL: "technical_issue",
             TicketCategory.FEATURE: "feature_request"
         }
@@ -143,16 +165,13 @@ class TicketAnalysisAgent:
             follow_up_prediction = "The customer might ask further technical support ."
         elif category == TicketCategory.FEATURE:
             follow_up_prediction = "The customer might inquire about the product roadmap or feature release timeline."
-        if sentiment < 0.5:
-            follow_up_prediction += "The customer is frustrated as thier issue does not seem to have been resolved and needs to be escalated to higher authorities."
-        else:
-            follow_up_prediction += "The customer is likely giving some constructive feedback or reviews/suggestion about some service"
+        if sentiment < 0.4:
+            follow_up_prediction += "The customer is frustrated as thier issue does not seem to have been resolved and may need to be escalated to higher authorities."
 
         
 
         #returning all required values 
         return TicketAnalysis(
-
             category=category,
             priority=priority,
             key_points=key_points,

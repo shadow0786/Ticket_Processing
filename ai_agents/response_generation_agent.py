@@ -1,7 +1,5 @@
 from data_classes import *
 
-
-
 class ResponseAgent:
     async def generate_response(self, ticket_analysis: TicketAnalysis, response_templates: dict[str, str], context: dict[str, any]) -> ResponseSuggestion:
        
@@ -37,9 +35,26 @@ class ResponseAgent:
         except Exception as e:
             response_text = "Error formatting response template."
         
-        # Dummy confidence score and determine if approval is required
-        confidence_score = 0.9
-        requires_approval = (ticket_analysis.priority == Priority.URGENT)
+        # Base confidence starts high 0.95 and is adjusted by several factors like rore key points may indicate a more complex ticket.
+        # So we can assume that if there are many key points, our confidence might be lower.
+        key_points_count = len(ticket_analysis.key_points)
+        key_points_factor = max(0.7, 1.0 - (key_points_count * 0.05))  # Reduce confidence by 5% per key point, but not below 0.7
+
+        # We also take into account the the sentiment score (assumed to be 0 to 1),
+        # where a higher positive sentiment suggests more calm and easier resolution.
+        sentiment_factor = ticket_analysis.sentiment
+
+        # Urgent tickets might be more challenging to resolve quickly.
+        urgency_factor = 0.88 if ticket_analysis.priority == Priority.URGENT else 1.0
+
+        # Combine factors into a final confidence score
+        base_confidence = 0.95
+        confidence_score = base_confidence * key_points_factor * sentiment_factor * urgency_factor
+
+        # Determine if approval is required: if the confidence score is below a threshold flag it for approval.
+        # In our case I chose 0.80 to be on safe side 
+        requires_approval = confidence_score < 0.80
+
         
         # Map response type to suggested actions based on response type
         action_mapping = {
