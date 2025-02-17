@@ -20,12 +20,12 @@ class ResponseAgent:
         template_vals = {
             "name": context.get("name", "Customer_Name"),
             "feature": context.get("feature", "Ticket_Processing"),
-            "diagnosis": context.get("diagnosis", "Unidentified Issue (Special Case)"),
-            "resolution_steps": context.get("resolution_steps", "Hello , we are looking into your problem and would get back to you soon ! "),
+            "diagnosis": context.get("diagnosis", "We apologise for the technical error in the software."),
+            "resolution_steps": context.get("resolution_steps", "We have assigned a dedicated team to look into your issue and expect to have it resolved at the earliest !"),
             "priority_level": ticket_analysis.priority.name,
-            "eta": context.get("eta", "As soon as Possible"),
+            "eta": context.get("eta", "As Soon As Possible"),
             "billing_topic": context.get("billing_topic", "your billing queries"),
-            "explanation": context.get("explanation", "We are reviewing your invoice details."),
+            "explanation": context.get("explanation", "We are reviewing your details and would get back with more information."),
             "next_steps": context.get("next_steps", "We will get in touch soon with more details")
         }
 

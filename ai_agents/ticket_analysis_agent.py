@@ -176,11 +176,11 @@ class TicketAnalysisAgent:
         elif category == TicketCategory.ACCESS:
             follow_up_prediction = "The customer might request additional troubleshooting steps or more privileged access."
         elif category == TicketCategory.TECHNICAL:
-            follow_up_prediction = "The customer might ask further technical support ."
+            follow_up_prediction = "The customer might ask for further technical support ."
         elif category == TicketCategory.FEATURE:
             follow_up_prediction = "The customer might inquire about the product roadmap or feature release timeline."
         if sentiment < 0.4:
-            follow_up_prediction += "The customer is frustrated as thier issue does not seem to have been resolved and may need to be escalated to higher authorities."
+            follow_up_prediction += "The customer is stressed as their issue seems to be complicated and may need to be escalated to higher authorities."
 
         
 

@@ -43,7 +43,7 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         context = {
             "name": "Yazan A",
             "feature": "admin dashboard",
-            "diagnosis": "idk I think there is some permission problem here.",
+            "diagnosis": "I think there is some permission problem here.",
             "resolution_steps": "Please try resetting your password.",
             "eta": "1.5 hours"
         }
@@ -53,8 +53,6 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Yazan A", response.response_text)
         self.assertIn("admin dashboard", response.response_text)
 
-    ##### 10 additional tests with different scenarios to test the algorithm for business impact , ticket category and priority level. 
-    
     async def test_error_handling(self):
         processor = TicketProcessor()
         # Ticket with missing content should trigger error handling
@@ -63,6 +61,8 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         resolution = await processor.process_ticket(ticket, RESPONSE_TEMPLATES)
         self.assertEqual(resolution.ticket_id, "TKT-007")
         self.assertIn("error", resolution.response.response_text.lower())
+
+     ##### 10 additional tests with different scenarios to test the algorithm for business impact , ticket category and priority level. 
 
     async def test_billing_ticket_with_invoice(self):
         # Ticket with billing keywords and invoice => High business impact
