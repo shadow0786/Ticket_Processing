@@ -71,7 +71,7 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         customer_info = {"role": "Customer"}
         analysis = await agent.analyze_ticket(content, customer_info)
         self.assertEqual(analysis.category, TicketCategory.BILLING)
-        self.assertEqual(analysis.priority, Priority.URGENT)
+        self.assertEqual(analysis.priority, Priority.MEDIUM)
         self.assertEqual(analysis.business_impact, "High")
 
     async def test_access_ticket_without_urgency(self):
@@ -85,14 +85,14 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(analysis.business_impact, "Low")
 
     async def test_technical_ticket_with_error(self):
-        # Ticket describing an error and system crashes (urgency detected)
+        # Ticket describing an error and system crashes
         agent = TicketAnalysisAgent()
-        content = "We are experiencing an error with the system crashing frequently."
+        content = "We are experiencing an error with the system crashing frequently. Pls look into this immediately !"
         customer_info = {"role": "Technician"}
         analysis = await agent.analyze_ticket(content, customer_info)
         self.assertEqual(analysis.category, TicketCategory.TECHNICAL)
         self.assertEqual(analysis.priority, Priority.HIGH)
-        self.assertEqual(analysis.business_impact, "Low")
+        self.assertEqual(analysis.business_impact, "High")
 
     async def test_feature_request_ticket(self):
         # Ticket that clearly requests a new feature
@@ -107,12 +107,12 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
     async def test_access_ticket_with_urgency(self):
         # Access issue with explicit urgency words ("ASAP", "can't access")
         agent = TicketAnalysisAgent()
-        content = "I can't access the admin dashboard, please fix this ASAP."
-        customer_info = {"role": "User"}
+        content = "I can't access the admin dashboard, please fix this ASAP. Cant make payments"
+        customer_info = {"role": "ceo"}
         analysis = await agent.analyze_ticket(content, customer_info)
         self.assertEqual(analysis.category, TicketCategory.ACCESS)
-        self.assertEqual(analysis.priority, Priority.HIGH)
-        self.assertEqual(analysis.business_impact, "Low")
+        self.assertEqual(analysis.priority, Priority.URGENT)
+        self.assertEqual(analysis.business_impact, "High")
 
     async def test_billing_ticket_with_payroll(self):
         # Billing ticket where invoice and payroll are mentioned, triggering urgent priority
@@ -121,7 +121,7 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         customer_info = {"role": "Customer"}
         analysis = await agent.analyze_ticket(content, customer_info)
         self.assertEqual(analysis.category, TicketCategory.BILLING)
-        self.assertEqual(analysis.priority, Priority.URGENT)
+        self.assertEqual(analysis.priority, Priority.MEDIUM)
         self.assertEqual(analysis.business_impact, "High")
 
     async def test_technical_ticket_system_down_with_director(self):
@@ -132,7 +132,7 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         analysis = await agent.analyze_ticket(content, customer_info)
         self.assertEqual(analysis.category, TicketCategory.TECHNICAL)
         self.assertEqual(analysis.priority, Priority.URGENT)
-        self.assertEqual(analysis.business_impact, "Low")
+        self.assertEqual(analysis.business_impact, "High")
 
     async def test_ambiguous_ticket(self):
         # A vague ticket with no clear keywords, so it defaults to technical and low impact
@@ -145,22 +145,22 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(analysis.business_impact, "Low")
 
     async def test_mixed_category_ticket(self):
-        # Ticket with both billing and technical terms; billing check comes first so it should be billing.
+        # Ticket with both billing and technical terms
         agent = TicketAnalysisAgent()
-        content = "I received an error on my invoice generation process."
+        content = " my invoice generation process is giving strange technical errors."
         customer_info = {"role": "Customer"}
         analysis = await agent.analyze_ticket(content, customer_info)
         self.assertEqual(analysis.category, TicketCategory.BILLING)
-        self.assertEqual(analysis.priority, Priority.URGENT)
+        self.assertEqual(analysis.priority, Priority.MEDIUM)
         self.assertEqual(analysis.business_impact, "High")
 
     async def test_urgent_ambiguous_ticket(self):
-        # Ticket with urgent language but no clear category words should default to technical with high priority.
+        # Ticket with urgent language from senior customer but no clear category words should default to technical with high priority.
         agent = TicketAnalysisAgent()
         content = "URGENT: Something went wrong, please address immediately!"
-        customer_info = {"role": "User"}
+        customer_info = {"role": "manager"}
         analysis = await agent.analyze_ticket(content, customer_info)
         self.assertEqual(analysis.category, TicketCategory.TECHNICAL)
-        self.assertEqual(analysis.priority, Priority.HIGH)
+        self.assertEqual(analysis.priority, Priority.URGENT)
         self.assertEqual(analysis.business_impact, "Low")
 

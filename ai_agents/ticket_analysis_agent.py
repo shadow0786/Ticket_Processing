@@ -13,15 +13,6 @@ class TicketAnalysisAgent:
         # For extra in future could use advacned tokenisation and stemming with stop word removal for more in depth analysis
         content_lowercase = ticket_content.lower()
 
-        # Define urgency keywords. I have added some extra keywords from those mentioned in the document ! 
-        urgency_keywords = ["asap", "urgent", "emergency" , "immediately", "crash",  "system down" ,"money lost" , "data lost"]
-
-        # Check if any urgency keywords are present in the ticket content.
-        urgency_detection = []
-        for word in urgency_keywords:
-            if word in content_lowercase:
-                urgency_detection.append(word)
-
     # Determine the category of the ticket based on the presence of certain words . 
     # For extra work in future would like to tackle this part with advanced nlp and sentiment analysis using llms or sentiment packages to understand context.
 
@@ -66,35 +57,58 @@ class TicketAnalysisAgent:
             category = TicketCategory.TECHNICAL  # Default category if no keywords found
 
 
-        # Determine priority based on urgency and customer role. Keep default Low Priority
+        # Determine priority based on urgency , business impact and customer role. Keep default Low Priority
+        # I have done basic priority identification based on words present for each priority category. There is some overlap also .
+        #  However for extra in future we would use advanced sentiment analysis and nlp packages along with LLM embedding to understand context.
+
         priority = Priority.LOW
 
-        # if there is an urgency 
-        if urgency_detection:
-            priority = Priority.HIGH
+        # Define urgency keywords. I have added some extra keywords from those mentioned in the document ! 
+        urgency_keywords = ["asap", "urgent", "emergency" , "immediately" , "fast"]
+
+        # Check if any urgency keywords are present in the ticket content.
+        urgency_detection = any(keyword in content_lowercase for keyword in urgency_keywords)
 
         # high value customers
-        customer_priority = ["director", "admin", "c-level", "ceo", "cto", "manager"]
+        customer_priority = ["director", "admin", "c-level", "ceo", "cto", "manager" , "financial" , "vp" , "cfo" , "md"]
         
+        # check if the customer role indicates high-level like C-suite
+        customer_is_high_level = False
         if customer_info:
-            # get customer title/job position 
             role = customer_info.get("role", "").lower()
-
-            # For higher roles, increase priority to urgent
-            if any(word in role for word in customer_priority):
-                priority = Priority.URGENT
+            if any(keyword in role for keyword in customer_priority):
+                customer_is_high_level = True
         
         # Check for business-impact keywords. Initial default impact set to low. 
-        impact_words = ["payroll", "demo" , "impact on business" , "payment" , "system down" , "business problem" , "emergency"]
-        business_impact = "Low"
-        if any(word in content_lowercase for word in impact_words):
-            business_impact = "High"
-            priority = Priority.URGENT
+        impact_words = ["payroll", "demo" , "impact on business" , "payment" , "system is down" , "business problem" , "emergency" , "revenue" , "invoice" , "system crash" , "bill"]
+        business_impact_present = any(word in content_lowercase for word in impact_words)
+        business_impact = "High" if business_impact_present else "Low"
 
-        # I have done basic priority identification based on words present. There is some overlap also . However for extra in future 
-        # we would use advanced sentiment analysis and nlp packages along with LLM embedding to understand context. 
-         
-        
+        # Count how many priority factors are present
+        score = 0
+        if urgency_detection:
+            score += 1
+        if business_impact_present:
+            score += 1
+        if customer_is_high_level: ## give more importance to high level customers queries. A senior position customer is always atleast High Priority
+            score += 2
+
+        # Assign priority based on score:
+        # if score is >= 3 : URGENT
+        # - score is 2 : HIGH
+        # - score is 1: MEDIUM 
+        # - score is 0 : LOW
+
+        if score >= 3:
+            priority = Priority.URGENT
+        elif score == 2:
+            priority = Priority.HIGH
+        elif score == 1:
+            priority = Priority.MEDIUM
+        else:
+            priority = Priority.LOW 
+
+
         # Extract key sentences with keywords
 
         #split text on new line
