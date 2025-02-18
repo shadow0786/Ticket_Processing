@@ -3,7 +3,6 @@ from data_classes import *
 from ai_agents.agent_orchestration import TicketProcessor
 from tests.templates import *
 import asyncio
-from tests import test_agent
 
 def interactive_cli():
     ## creating an iterative ui where user can enter info like query , their job position , etc. and a sample ticket analysis 
