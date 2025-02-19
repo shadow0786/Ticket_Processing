@@ -64,7 +64,7 @@ class TicketAnalysisAgent:
         priority = Priority.LOW
 
         # Define urgency keywords. I have added some extra keywords from those mentioned in the document ! 
-        urgency_keywords = ["asap", "urgent", "emergency" , "immediately" , "fast"]
+        urgency_keywords = ["asap", "urgent", "emergency" , "immediately" , "fast" , "quick"]
 
         # Check if any urgency keywords are present in the ticket content.
         urgency_detection = any(keyword in content_lowercase for keyword in urgency_keywords)
