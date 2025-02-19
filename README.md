@@ -2,6 +2,11 @@
 
 This repository contains an AI-powered system designed to process customer support tickets by analyzing their content, determining the correct category and priority, and generating appropriate responses. The system is composed of several modular components and includes robust unit tests to ensure high accuracy and reliability.
 
+## Demo Video
+
+A demo video showcasing the system in action can be viewed [here](https://www.dropbox.com/scl/fi/dy5w81zvcp3sx4onlpe58/demo_video.mp4?rlkey=t5m8dcpc2ckomhwhupkm494v7&st=m2jkbkaw&dl=0).
+
+
 ## Project Structure
 
 ```plaintext
@@ -86,8 +91,8 @@ ai-ticket-processing/
 ### Category Detection
 - **Keywords:** Each ticket category is associated with a set of keywords. For example:
   - **BILLING:** "billing", "invoice", "pro-rating", "account", "cost", "money", "payroll"
-  - **ACCESS:** "admin dashboard", "access", "login", "403", "authentication", "security", "admin", "dashboard"
-  - **FEATURE:** "feature", "request", "function", "characteristic"
+  - **ACCESS:** "access", "login", "403", "authentication", "security", "admin", "dashboard" , "permission"
+  - **FEATURE:** "feature", "function"
   - **TECHNICAL:** "crash", "system", "failed", "technical error", "not working", "server", "down", "stuck"
 - **Method:**
   - Counts occurrences of each category’s keywords in the ticket content.
@@ -97,9 +102,9 @@ ai-ticket-processing/
 
 ### Priority Detection
 - **Factors Considered:**
-  - **Urgency Keywords:** e.g., "asap", "urgent", "emergency" , "immediately" , "fast".
-  - **Business Impact:** e.g., "payroll", "demo" , "impact on business" , "payment" , "system is down" , "business problem" , "emergency" , "revenue" , "invoice" , "system crash" , "bill".
-  - **High-Level Customer:** e.g., "director", "admin", "c-level", "ceo", "cto", "manager" , "financial" , "vp" , "cfo" , "md".
+  - **Urgency Keywords:** e.g., "asap", "urgent", "emergency" , "immediately" , "fast" , "quick" .
+  - **Business Impact:** e.g., "pay", "demo" , "impact on business" , "system is down" , "business problem" , "emergency" , "revenue" , "invoice" , "system crash" , "bill" , "dashboard" .
+  - **High-Level Customer:** e.g., "director", "c-level", "ceo", "cto", "vp" , "cfo" , "md" , "managing" .
 - **Scoring System:**
   - **1 point** for urgency keywords.
   - **1 point** for business impact.

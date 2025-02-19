@@ -80,7 +80,7 @@ class TicketAnalysisAgent:
                 customer_is_high_level = True
         
         # Check for business-impact keywords. Initial default impact set to low. 
-        impact_words = ["pay", "demo" , "impact on business" , "payment" , "system is down" , "business problem" , "emergency" , "revenue" , "invoice" , "system crash" , "bill" , "dashboard"]
+        impact_words = ["pay", "demo" , "impact on business", "system is down" , "business problem" , "emergency" , "revenue" , "invoice" , "system crash" , "bill" , "dashboard"]
         business_impact_present = any(word in content_lowercase for word in impact_words)
         business_impact = "High" if business_impact_present else "Low"
 
