@@ -2,9 +2,9 @@
 
 This repository contains an AI-powered system designed to process customer support tickets by analyzing their content, determining the correct category and priority, and generating appropriate responses. The system is composed of several modular components and includes robust unit tests to ensure high accuracy and reliability.
 
-## Demo Video
+## Demo Video and GitHub
 
-A demo video showcasing the system in action can be viewed [here](https://www.dropbox.com/scl/fi/dy5w81zvcp3sx4onlpe58/demo_video.mp4?rlkey=t5m8dcpc2ckomhwhupkm494v7&st=m2jkbkaw&dl=0).
+A demo video showcasing the system in action can be viewed [here](https://www.dropbox.com/scl/fi/dy5w81zvcp3sx4onlpe58/demo_video.mp4?rlkey=t5m8dcpc2ckomhwhupkm494v7&st=m2jkbkaw&dl=0). Github repo can be viewed [here](https://github.com/shadow0786/Ticket_Processing.git)
 
 
 ## Project Structure
