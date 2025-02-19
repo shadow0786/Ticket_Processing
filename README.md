@@ -110,6 +110,14 @@ ai-ticket-processing/
   - **Score = 1:** MEDIUM
   - **Score = 0:** LOW
 
+### Advanced Sentiment Analysis & Follow-up Prediction
+- **Sentiment Analysis:**
+  - Utilizes libraries like VADER (or transformer-based models) to analyze ticket content sentiment.
+  - Converts the sentiment polarity to a normalized score between 0 and 1.
+- **Follow-up Prediction:**
+  - Generates a follow-up prediction based on the sentiment score and ticket category.
+  - For example, a negative sentiment in a billing ticket might trigger a prediction that the customer will ask for further clarification on invoice details.
+
 ### Confidence Score Calculation (in Response Generation)
 - **Components:**
   - **Key Points Factor:** More key points might indicate a complex ticket.

@@ -105,7 +105,9 @@ We have received your technical issue report. Our technical team is reviewing th
 
 {diagnosis}
 
-Please standby while we investigate the problem further.
+{resolution_steps}
+
+Thanks for understanding and apologies for any inconvenience.
 
 Priority: {priority_level}
 ETA: {eta}
@@ -118,7 +120,7 @@ Hi {name},
 
 Thank you for your feature request. We appreciate your feedback and are evaluating your suggestion.
 
-Our product team will review the feasibility of this feature.
+{resolution_steps}
 
 Best regards,
 Product Team

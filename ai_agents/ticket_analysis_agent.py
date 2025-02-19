@@ -17,8 +17,8 @@ class TicketAnalysisAgent:
     # For extra work in future would like to tackle this part with advanced nlp and sentiment analysis using llms or sentiment packages to understand context.
 
         billing = ["billing" , "invoice" , "pro-rating" , "account" , "cost" , "money" , "payroll"]
-        access = ["admin dashboard" , "access" , "login" , "403" , "authentication" , "security" , "admin" , "dashboard"]
-        feature = ["feature" , "request" , "function" , "characteristic"]
+        access = ["access" , "login" , "403" , "authentication" , "security" , "admin" , "dashboard" , "permission"]
+        feature = ["feature" , "function"]
         technical = ["crash" , "system" , "failed" , "technical error" , "not working" , "server" , "down" , "stuck"]
 
         category_keywords = {
@@ -70,17 +70,17 @@ class TicketAnalysisAgent:
         urgency_detection = any(keyword in content_lowercase for keyword in urgency_keywords)
 
         # high value customers
-        customer_priority = ["director", "admin", "c-level", "ceo", "cto", "manager" , "financial" , "vp" , "cfo" , "md"]
+        customer_priority = ["director", "c-level", "ceo", "cto" , "vp" , "cfo" , "md","managing"]
         
         # check if the customer role indicates high-level like C-suite
         customer_is_high_level = False
         if customer_info:
             role = customer_info.get("role", "").lower()
-            if any(keyword in role for keyword in customer_priority):
+            if any(keyword in role for keyword in customer_priority) or role == 'admin':
                 customer_is_high_level = True
         
         # Check for business-impact keywords. Initial default impact set to low. 
-        impact_words = ["payroll", "demo" , "impact on business" , "payment" , "system is down" , "business problem" , "emergency" , "revenue" , "invoice" , "system crash" , "bill"]
+        impact_words = ["payroll", "demo" , "impact on business" , "payment" , "system is down" , "business problem" , "emergency" , "revenue" , "invoice" , "system crash" , "bill" , "dashboard"]
         business_impact_present = any(word in content_lowercase for word in impact_words)
         business_impact = "High" if business_impact_present else "Low"
 
@@ -143,13 +143,13 @@ class TicketAnalysisAgent:
 
         # Assign the correct support team
         support_expertise = {
-            TicketCategory.ACCESS: ["System Administrator" , "Access Manager"],
-            TicketCategory.BILLING: ["Billing accountant", "Account Manager" , "Financial Manager"],
-            TicketCategory.TECHNICAL: ["Technical Support Engineer" , "Customer Support"],
-            TicketCategory.FEATURE: ["Product Manager", "Developer" , "Project Manager"]
+            TicketCategory.ACCESS: ["System Administrator and Access Manager."],
+            TicketCategory.BILLING: ["Billing accountant and Account Manager. "],
+            TicketCategory.TECHNICAL: ["Technical Support Engineer and Customer Support."],
+            TicketCategory.FEATURE: ["Product Manager and Developer."]
         }
         # determine support and if no category send to general support 
-        required_expertise = support_expertise.get(category, ["General Support"])
+        required_expertise = support_expertise.get(category, ["General Support."])
         
         ## Advanced extra sentiment analysis using vader package to determine positive or negative sentiment of ticket data 
         # Initialize VADER SentimentIntensityAnalyzer

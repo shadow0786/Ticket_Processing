@@ -18,9 +18,19 @@ def interactive_cli():
         if role.lower() == 'exit':
             break
 
-        content = input("Enter ticket content: ").strip()
-        if content.lower() == 'exit':
-            break
+        # Multi-line input for ticket content
+        print("Enter ticket content (Type 'END' on a new line when finished):")
+        content_lines = []
+        while True:
+            line = input().strip()
+            if line.lower() == "end":
+                break
+            content_lines.append(line)
+        
+        content = "\n".join(content_lines)  # to keep multi-line formatting in interface
+        if not content:
+            content = 'The customer has a general error ! '
+
 
         subject = input("Enter ticket subject (or leave blank for default): ").strip()
         if subject.lower() == 'exit':

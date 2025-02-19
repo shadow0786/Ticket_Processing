@@ -4,6 +4,7 @@ from data_classes import *
 from ai_agents.response_generation_agent import ResponseAgent
 from ai_agents.agent_orchestration import TicketProcessor
 from tests.templates import *
+import asyncio
 
 
 ## test class to initialise and conduct the test
@@ -30,8 +31,8 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         analysis = TicketAnalysis(
             category=TicketCategory.ACCESS,
             priority=Priority.URGENT,
-            key_points=["Can't access the dashboard"],
-            required_expertise=["System Administrator"],
+            key_points=["admin dashboard not accessible" , "Pls look into this asap as payments cant be processed !"],
+            required_expertise=["System Administrator and Access Manager"],
             sentiment=0.8,
             urgency_indicators=["asap"],
             business_impact="High",
@@ -42,16 +43,16 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         response_agent = ResponseAgent()
         context = {
             "name": "Yazan A",
-            "feature": "admin dashboard",
-            "diagnosis": "I think there is some permission problem here.",
-            "resolution_steps": "Please try resetting your password.",
-            "eta": "1.5 hours"
+            "subject": "admin dashboard not accessible",
+            "content": "I think there is some permission problem here. Pls look into this asap as payments cant be processed !",
         }
 
         #checking if we received the expected response 
         response = await response_agent.generate_response(analysis, RESPONSE_TEMPLATES, context)
         self.assertIn("Yazan A", response.response_text)
-        self.assertIn("admin dashboard", response.response_text)
+        self.assertIn("System Administrator and Access Manager", response.response_text)
+        self.assertIn("reset your password", response.response_text)
+        self.assertIn("the admin dashboard", response.response_text)
 
     async def test_error_handling(self):
         processor = TicketProcessor()
@@ -61,6 +62,7 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         resolution = await processor.process_ticket(ticket, RESPONSE_TEMPLATES)
         self.assertEqual(resolution.ticket_id, "TKT-007")
         self.assertIn("error", resolution.response.response_text.lower())
+
 
      ##### 10 additional tests with different scenarios to test the algorithm for business impact , ticket category and priority level. 
 
@@ -161,6 +163,20 @@ class TestTicketProcessing(unittest.IsolatedAsyncioTestCase):
         customer_info = {"role": "manager"}
         analysis = await agent.analyze_ticket(content, customer_info)
         self.assertEqual(analysis.category, TicketCategory.TECHNICAL)
-        self.assertEqual(analysis.priority, Priority.URGENT)
+        self.assertEqual(analysis.priority, Priority.MEDIUM)
         self.assertEqual(analysis.business_impact, "Low")
+
+    print("Printing responses to all tickets provided in template to check answers")
+    ## printing responses to all tickets provided in template to check answers
+    async def process_sample_tickets():
+        processor = TicketProcessor()
+        all_tickets = SAMPLE_TICKETS + EDGE_CASE_TICKETS + AMBIGUOUS_TICKETS
+        for ticket in all_tickets:
+            resolution = await processor.process_ticket(ticket, RESPONSE_TEMPLATES)
+            print("Ticket ID:", resolution.ticket_id)
+            print("Analysis:", resolution.analysis)
+            print("Response:\n", resolution.response.response_text)
+            print("-" * 50)
+    
+    asyncio.run(process_sample_tickets())
 

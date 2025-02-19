@@ -20,7 +20,7 @@ class TicketProcessor:
             
             # Analyze the ticket content and call the ticketanalysis class first. Also add default values just in case
             analysis = await self.analysis_agent.analyze_ticket(
-                ticket_content=ticket.get("content", ""),
+                ticket_content=ticket.get("content", ticket.get("subject")),
                 customer_info=ticket.get("customer_info", {})
             )
             
