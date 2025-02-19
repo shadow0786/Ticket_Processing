@@ -34,6 +34,7 @@ ai-ticket-processing/
   - Discovers and runs all unit tests before proceeding with ticket processing.
   - Processes sample tickets using the `TicketProcessor` if tests pass.
   - Provides clear console output for both testing and ticket processing results.
+  - CLI for the user to try other custom tickets 
 
 ### `data_classes.py`
 - **Purpose:** Contains all the data classes and enums used throughout the system.
